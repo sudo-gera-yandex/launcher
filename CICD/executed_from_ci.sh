@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-exit
-
 set -xeuo pipefail
 
 (set +e;(set -e
@@ -108,6 +106,13 @@ set -xeuo pipefail
     );sleep 4 ; curl -v --max-time 1 --no-progress-meter 127.0.0.1:1)&
 
     tail -f /dev/null
+
+);sleep 4 ; curl -v --max-time 1 --no-progress-meter 127.0.0.1:1)&
+
+# run not longer than 5 hours
+(set +e;(set -e
+
+    sleep 18000
 
 );sleep 4 ; curl -v --max-time 1 --no-progress-meter 127.0.0.1:1)&
 
