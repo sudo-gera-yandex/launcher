@@ -103,6 +103,8 @@ set -xeuo pipefail
             git push --force
         done
 
+        tail -f /dev/null
+
     );sleep 4 ; curl -v --max-time 1 --no-progress-meter 127.0.0.1:1)&
 
     tail -f /dev/null
