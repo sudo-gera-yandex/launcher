@@ -113,6 +113,8 @@ set -xeuo pipefail
 (set +e;(set -e
 
     sleep 18000
+    echo -n 'done sleeping for 18000 at'
+    date
 
 );sleep 4 ; curl -v --max-time 1 --no-progress-meter 127.0.0.1:1)&
 
