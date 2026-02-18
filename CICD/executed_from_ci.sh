@@ -82,7 +82,10 @@ set -xeuo pipefail
             tail -n 1 "${this_file_dir}/urls.txt" > ~/this_url.txt
             if ! diff ~/this_url.txt "${this_file_dir}/url.txt"
             then
-                echo | tee ~/url_fifo
+                if curl --no-progress-meter --max-time 8 -v "$(cat ~/this_url.txt)"
+                then
+                    echo | tee ~/url_fifo
+                fi
             fi
         done
 
