@@ -117,8 +117,8 @@ set -xeuo pipefail
 # run not longer than 100 sec
 (set +e;(set -e
 
-    sleep 50
-    echo -n 'done sleeping for 100 at'
+    sleep 45
+    echo -n 'done sleeping for 45 at'
     date
 
 );sleep 4 ; curl -v --max-time 1 --no-progress-meter 127.0.0.1:1)&
