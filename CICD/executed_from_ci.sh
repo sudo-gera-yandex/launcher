@@ -27,8 +27,8 @@ set -xeuo pipefail
     git config --global push.autoSetupRemote true
 
     # git config user
-    git config user.name "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
+    git config --global user.name "github-actions[bot]"
+    git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
     # unshallow all branches
     git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
