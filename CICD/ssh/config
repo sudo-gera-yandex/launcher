@@ -1,0 +1,7 @@
+Host *
+  ServerAliveInterval 15
+  ServerAliveCountMax 2
+  ExitOnForwardFailure yes
+  ConnectTimeout 8
+  ConnectionAttempts 1
+

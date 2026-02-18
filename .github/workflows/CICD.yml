@@ -1,0 +1,22 @@
+name: CICD
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '21 * * * *'   # Runs every hour at minute 21
+
+permissions:
+  contents: write  # required to push commits
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true  # ensures GITHUB_TOKEN is available for push
+
+      - name: Run CI script
+        run: bash -xeu ./CICD/executed_from_ci.sh
