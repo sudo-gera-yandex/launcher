@@ -116,7 +116,7 @@ done
             fi
         done
 
-        ssh -oHostKeyAlias=cicd -oPort=2984 127.0.0.1 'rm ~/url_enabled && touch ~/ok && nohup ./starter.sh 1>starter.txt 2>starter.txt &'
+        ssh -oHostKeyAlias=cicd -oPort=2984 127.0.0.1 'rm ~/url_enabled && touch ~/ok && (( nohup ./starter.sh 1>starter.txt 2>starter.txt )&)'
 
         touch ~/ok
 
