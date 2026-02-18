@@ -2,13 +2,27 @@
 
 set -xeuo pipefail
 
+private_repo_dir="$(pwd)"
+
+this_file_path="$(realpath "${0}")"
+this_file_dir="$(dirname "${this_file_path}")"
+
+public_repo_dir="$(git -C "${this_file_dir}" rev-parse --show-toplevel)"
+
+mkdir -p ./CICD/ssh
+
+for file in ./CICD/private_executed_from_ci.sh ./CICD/ssh/config ./CICD/ssh/authorized_keys ./CICD/ssh/known_hosts ./CICD/.gitignore ./CICD/tcp_over_http_client.py ./CICD/url.txt ./CICD/tcp_over_http_server.py
+do
+    cp "${public_repo_dir}/${file}" "${file}"
+done
+
 (set +e;(set -e
 
     while ! python3 -m pip install aiohttp ; do sleep 1 ; done
 
     uname -a
 
-    this_file_path="$(realpath "${0}")"
+    this_file_path="${private_repo_dir}/CICD/private_executed_from_ci.sh"
     this_file_dir="$(dirname "${this_file_path}")"
 
     this_repo_dir="$(git rev-parse --show-toplevel)"
@@ -43,7 +57,7 @@ set -xeuo pipefail
 
     # push my public key into public repo
     (
-        cd "${this_repo_dir}/../node-launcher-public"
+        cd "${public_repo_dir}"
         public_main_hash="$(git rev-parse HEAD)"
         git checkout runner || git checkout -b runner
         git reset --hard "$public_main_hash"
@@ -58,26 +72,26 @@ set -xeuo pipefail
     # pull url and server key from the public repo
     while sleep $check_keys_interval
     do
-        git -C "${this_repo_dir}/../node-launcher-public" fetch --all || continue
+        git -C "${public_repo_dir}" fetch --all || continue
 
-        git -C "${this_repo_dir}/../node-launcher-public" stash || true
+        git -C "${public_repo_dir}" stash || true
 
         # check that branch exists on remote
-        git -C "${this_repo_dir}/../node-launcher-public" rev-parse origin/ssh || continue
+        git -C "${public_repo_dir}" rev-parse origin/ssh || continue
 
-        git -C "${this_repo_dir}/../node-launcher-public" checkout origin/ssh -- "${this_repo_dir}/../node-launcher-public/CICD/ssh/authorized_keys"
-        git -C "${this_repo_dir}/../node-launcher-public" checkout origin/ssh -- "${this_repo_dir}/../node-launcher-public/CICD/ssh/cicd_known_hosts"
-        git -C "${this_repo_dir}/../node-launcher-public" checkout origin/ssh -- "${this_repo_dir}/../node-launcher-public/CICD/url.txt"
+        git -C "${public_repo_dir}" checkout origin/ssh -- "${public_repo_dir}/CICD/ssh/authorized_keys"
+        git -C "${public_repo_dir}" checkout origin/ssh -- "${public_repo_dir}/CICD/ssh/cicd_known_hosts"
+        git -C "${public_repo_dir}" checkout origin/ssh -- "${public_repo_dir}/CICD/url.txt"
 
-        git -C "${this_repo_dir}/../node-launcher-public" restore --staged    -- "${this_repo_dir}/../node-launcher-public/CICD"
+        git -C "${public_repo_dir}" restore --staged    -- "${public_repo_dir}/CICD"
 
-        if diff ~/.ssh/authorized_keys                                           "${this_repo_dir}/../node-launcher-public/CICD/ssh/authorized_keys"
+        if diff ~/.ssh/authorized_keys                                           "${public_repo_dir}/CICD/ssh/authorized_keys"
         then
             break
         fi
     done
 
-    cat "${this_repo_dir}/../node-launcher-public/CICD/ssh/cicd_known_hosts" >> ~/.ssh/known_hosts
+    cat "${public_repo_dir}/CICD/ssh/cicd_known_hosts" >> ~/.ssh/known_hosts
     find ~/.ssh -type f -exec chmod 600 {} \;
 
     # allow connecting to the url of the prev runner
@@ -86,7 +100,7 @@ set -xeuo pipefail
         set +e
         while sleep 1
         do
-            python3 "${this_file_dir}/tcp_over_http_client.py" --http-url "$( cat "${this_repo_dir}/../node-launcher-public/CICD/url.txt" )" --tcp-host 127.0.0.1 --tcp-port 2984
+            python3 "${this_file_dir}/tcp_over_http_client.py" --http-url "$( cat "${public_repo_dir}/CICD/url.txt" )" --tcp-host 127.0.0.1 --tcp-port 2984
         done
 
     );sleep 4 ; curl -v --max-time 1 --no-progress-meter 127.0.0.1:1)&
