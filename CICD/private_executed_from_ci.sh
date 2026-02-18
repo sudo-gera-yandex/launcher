@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -xeuo pipefail
+
 (set +e;(set -e
 
     while ! python3 -m pip install aiohttp ; do sleep 1 ; done
@@ -115,7 +117,7 @@
 # run not longer than 100 sec
 (set +e;(set -e
 
-    sleep 100
+    sleep 50
     echo -n 'done sleeping for 100 at'
     date
 
