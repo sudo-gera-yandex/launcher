@@ -64,6 +64,7 @@ done
         cp ~/.ssh/authorized_keys "CICD/ssh/authorized_keys"
         git add CICD/ssh/authorized_keys
         git commit -mm
+        git remote -v
         git push --force
     )
 
